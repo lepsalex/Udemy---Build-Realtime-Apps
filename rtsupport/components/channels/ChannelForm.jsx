@@ -14,8 +14,6 @@ class ChannelForm extends React.Component {
       <form onSubmit={this.onSubmit.bind(this)}>
         <input type='text'
           ref='channel'
-          onChange={this.onChange.bind(this)}
-          value={this.state.channelName}
         />
       </form>
     );
