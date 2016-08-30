@@ -6,26 +6,69 @@ import MessageSection from './messages/MessageSection.jsx';
 class App extends Component {
   constructor(props) {
       super(props);
+      // Set default app state
       this.state = {
         channels: [],
-        activeChannel: {},
         users: [],
-        messages: []
+        messages: [],
+        activeChannel: {},
+        connected: false
       };
   }
 
-  addChannel(name) {
-    let {channels} = this.state;
-    channels.push({id: channels.length, name});
-    this.setState({channels});
-    // TODO: Send to Server
+  componentDidMount() {
+    /*
+     * Once compoent has rendered with empty state
+     * open server connection (WebSocket)
+     */
+    let ws = this.ws = new WebSocket('ws://echo.websocket.org');
+    ws.onmessage = this.message.bind(this);
+    ws.onopen = this.open.bind(this);
+    ws.onclose = this.close.bind(this);
   }
 
+  message(e) {
+    const event = JSON.parse(e.data);
+    if (event.name === 'channel add') {
+      this.newChannel(event.data);
+    }
+  }
+
+  open() {
+    this.setState({connected: true});
+  }
+
+  close() {
+    this.setState({connected: false});
+  }
+
+  // Recieve new channel added event
+  newChannel(channel) {
+    let {channels} = this.state;
+    channels.push(channel);
+    this.setState({channels});
+  }
+
+  // Adds channel to slack-clone
+  addChannel(name) {
+    let {channels} = this.state;
+    let msg = {
+      name: 'channel add',
+      data: {
+        id: channels.length,
+        name
+      }
+    };
+    this.ws.send(JSON.stringify(msg));
+  }
+
+  // Sets active channel in Interface for current User
   setChannel(activeChannel) {
     this.setState({activeChannel});
     // TODO: Get Channels Messages from server
   }
 
+  // Sets the current user name
   setUserName(name) {
     let {users} = this.state;
     users.push({id: users.length, name});
@@ -33,6 +76,7 @@ class App extends Component {
     // TODO: Send to Server
   }
 
+  // Adds a message to a channel thread
   addMessage(body) {
     let {messages, users} = this.state;
     let createdAt = new Date;
