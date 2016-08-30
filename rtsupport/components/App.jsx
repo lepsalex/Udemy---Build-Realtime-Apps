@@ -21,25 +21,7 @@ class App extends Component {
      * Once compoent has rendered with empty state
      * open server connection (WebSocket)
      */
-    let ws = this.ws = new WebSocket('ws://echo.websocket.org');
-    ws.onmessage = this.message.bind(this);
-    ws.onopen = this.open.bind(this);
-    ws.onclose = this.close.bind(this);
-  }
-
-  message(e) {
-    const event = JSON.parse(e.data);
-    if (event.name === 'channel add') {
-      this.newChannel(event.data);
-    }
-  }
-
-  open() {
-    this.setState({connected: true});
-  }
-
-  close() {
-    this.setState({connected: false});
+    let ws = this.ws = new WebSocket('ws://echo.websocket.org');  
   }
 
   // Recieve new channel added event
