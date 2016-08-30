@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 
 /* Sockets Interface Class */
 class Socket {
-  constructor(ws = new WebSocket(), ee = new EventEmitter()) {
+  constructor(ws = new WebSocket('ws://echo.websocket.org'), ee = new EventEmitter()) {
     this.ws = ws;
     this.ee = ee;
     ws.onmessage = this.message.bind(this);
@@ -20,30 +20,30 @@ class Socket {
     this.ee.removeListener(name, fn);
   }
 
-  // Emit Method (private)
-  _emit(name, data) {
+  // Emit Method)
+  emit(name, data) {
     const message = JSON.stringify({name, data});
     this.ws.send(message);
   }
 
-  // Public Message Method
+  // Message Method
   message(e) {
     try {
       const message = JSON.parse(e.data);
-      this.ee._emit(message.name, message.data);
+      this.ee.emit(message.name, message.data);
     } catch(err) {
-      this.ee._emit('error', err);
+      this.ee.emit('error', err);
     }
   }
 
   // Connection Event
   open() {
-    this.ee._emit('connect');
+    this.ee.emit('connect');
   }
 
   // Disconnection Event
   close() {
-    this.ee._emit('disconnect');
+    this.ee.emit('disconnect');
   }
 }
 
