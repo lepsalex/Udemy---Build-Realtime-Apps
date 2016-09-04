@@ -23,8 +23,11 @@ class App extends Component {
      * open server connection (WebSocket)
      */
 
+    // Connection to GO Backend
+    let ws = new WebSocket("ws://localhost:4000")
+
     // Init new socket class object
-    let socket = this.socket = new Socket();
+    let socket = this.socket = new Socket(ws);
 
     // Wire up events
     socket.on('connect', this.onConnect.bind(this));
